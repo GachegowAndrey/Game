@@ -204,7 +204,7 @@ var Game = {
 
 var Player = function(){
 	this.width = 60;
-	this.height = 30;
+	this.height = 20;
 	this.x = Game.c.width/2 - this.width/2;
 	this.y = Game.c.height - this.height;
 	this.movingLeft = false;
