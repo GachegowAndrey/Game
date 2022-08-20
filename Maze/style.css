@@ -1,9 +1,11 @@
 
 body{
-  background-color: #0D0;
+  background-color: #fee;
 }
 
-.Back, .Restart{
+
+
+.Back, .Restart {
    position: fixed;
    right: 30%;
    top: 3%;
@@ -17,6 +19,12 @@ body{
 .Restart{
   top: 18%;
 }
+
+
+
+
+
+
 .Back:hover,.Restart:hover{
     padding: 5px;
     margin: 10px;
@@ -64,7 +72,7 @@ body{
   height: 360px;
   position: absolute;
   top: 45%;
-  right: 15%;
+  left: 50%;
   width: 640px;
   z-index: 1000;
 }

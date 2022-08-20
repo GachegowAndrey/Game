@@ -31,21 +31,7 @@ a{
 	cursor: url('../img/cursor.png') 24 24, auto;
 }
 
-.game:hover .game__win{
-	animation: win 60s steps(1) forwards;
-}
 
-.game:hover .game__counter:after{
-	animation: timer_1 60s steps(60) forwards;
-}
-.game:hover .game__text span:after{
-	animation: timer_2 60s steps(60) forwards;
-}
-
-.game__body:hover .game__counter:after,
-.game__body:hover .game__text span:after{
-	animation-play-state: paused;
-}
 
 .game__body,
 .game__items {
@@ -186,7 +172,21 @@ a{
 .game__body:hover .game__text{
 	visibility: visible;
 }
+.game:hover .game__win{
+	animation: win 60s steps(1) forwards;
+}
 
+.game:hover .game__counter:after{
+	animation: timer_1 60s steps(60) forwards;
+}
+.game:hover .game__text span:after{
+	animation: timer_2 60s steps(60) forwards;
+}
+
+.game__body:hover .game__counter:after,
+.game__body:hover .game__text span:after{
+	animation-play-state: paused;
+}
 .game__text {
 	font-size: 40px;
 	visibility: hidden;
@@ -201,6 +201,7 @@ a{
 }
 
 .game__counter {
+	color:red;
 	position: absolute;
 	bottom: 20px;
 	left: 20px;
@@ -208,6 +209,7 @@ a{
 	font-size: 26px;
 	overflow: hidden;
 	white-space: nowrap;
+	z-index:3;
 }
 
 .game__text span:after,

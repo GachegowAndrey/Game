@@ -1,4 +1,8 @@
 var startTime = Date.now();
+
+
+	
+	
 var Turns=0;
 ! function(hate, width, maze, walls, currentPosition) {
   hate = hate % 2 == 0 ? hate + 1 : hate;
@@ -14,7 +18,8 @@ var Turns=0;
   }
 
   function amaze(y, x, addBlockWalls) {
-    maze[y][x] = 'maze';
+    
+	maze[y][x] = 'maze';
     document.getElementById(y + '-' + x).className = 'block';
     if (addBlockWalls && valid(y + 1, x) && (maze[y + 1][x] == 'wall')) walls.push([y + 1, x, [y, x]]);
     if (addBlockWalls && valid(y - 1, x) && (maze[y - 1][x] == 'wall')) walls.push([y - 1, x, [y, x]]);
@@ -50,3 +55,10 @@ var Turns=0;
     }
   }
 }(parseInt(20), parseInt(20), [], [], [0, 0])
+//if(setTimeout(10000){
+	//sayLose();
+	//} 
+	//else{
+	//sayWin();
+	//}
+

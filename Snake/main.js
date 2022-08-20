@@ -1,3 +1,13 @@
+var winScores=10;
+alert('Eat '+winScores+' for win');
+function win(){
+  alert('You are win '+score);
+ }
+ 
+ function lose(){
+  alert(`You lose! Try again, poor fellow!
+  Your score is `+score);
+ }
 let scoreBlock;
 let score = 0;
 
@@ -73,6 +83,7 @@ function drawSnake() {
 		for( let i = index + 1; i < snake.tails.length; i++ ) {
 
 			if ( el.x == snake.tails[i].x && el.y == snake.tails[i].y ) {
+				lose();
 				refreshGame();
 			}
 
@@ -123,8 +134,11 @@ function randomPositionBerry() {
 function incScore() {
 	score++;
 	drawScore();
+	if(score>=winScores){win();
+	  window.location.reload(true)
+	}
 }
-
+ 
 function drawScore() {
 	scoreBlock.innerHTML = score;
 }
