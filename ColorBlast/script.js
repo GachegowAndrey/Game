@@ -1,6 +1,6 @@
 // Color Blast!
 // License MIT
-// © 2014 Nate Wiley
+// Â© 2014 Nate Wiley
 
 (function(window){
 
