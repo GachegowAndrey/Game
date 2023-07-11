@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta name = 'viewport' content = 'width = device-width, initial-scale = 1.0, maximum-scale = 1.0, minimum-scale = 1.0, user-scalable = no, minimal-ui'>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    
+    
+    
+</head>
+
+<body>
+
+    <div id = 'open-menu' onclick = 'toggleMenuState()'>➜</div>
+    
+    <!-- Открытие/закрытие меню -->
+    <script>
+        function toggleMenuState(){
+            if (id('menu').style.top == '0px'){
+                id('open-menu').style.transform = 'rotate(90deg) scale(1, 1)'
+                id('open-menu').style.top = '0'
+                id('menu').style.top = '-50vh'
+            }
+            else {
+                id('open-menu').style.transform = 'rotate(90deg) scale(-1, 1)'
+                id('open-menu').style.top = '50vh'
+                id('menu').style.top = '0'
+            }
+        }
+    </script>
+    
+    
+    <div id = 'menu'>
+        
+        <div id = 'presets-selector'>
+            <p>Selecting the difficulty level</p>
+            <button id = 'easy-preset'   onclick = 'setDifficulty("easy")'>Beginner</button>
+            <button id = 'normal-preset' onclick = 'setDifficulty("normal")'>Experienced</button>
+            <button id = 'hard-preset'   onclick = 'setDifficulty("hard")'>Professional</button>
+            
+            <!-- Установление пресета сложности при нажатии на кнопку пресета -->
+            <script>
+                function setDifficulty(difficulty){
+                    if (difficulty == 'easy'){
+                        id('x-size').value = 8
+                        id('y-size').value = 8
+                        id('bombs-count').value = 10
+                    }
+                    if (difficulty == 'normal'){
+                        id('x-size').value = 16
+                        id('y-size').value = 16
+                        id('bombs-count').value = 40
+                    }
+                    if (difficulty == 'hard'){
+                        id('x-size').value = 16
+                        id('y-size').value = 30
+                        id('bombs-count').value = 99
+                    }
+                    restart()
+                    toggleMenuState()
+                }
+            </script>
+        </div>
+        
+        <div id = 'manual-selector'>
+
+            <div class = 'size-selector'>
+                 <p>Vertical size</p><br>
+                 <input type = 'text' value = '12' id = 'y-size'>
+             </div>
+
+             <div class = 'size-selector'>
+                 <p>Horizontal size</p><br>
+                 <input type = 'text' value = '12' id = 'x-size'>
+             </div>
+
+             <div class = 'size-selector'>
+                 <p>Number of bombs<br><span style = 'font-size: 16px;'>(empty - automatically)</span></p><br>
+                 <input type = 'text' value = '22' id = 'bombs-count'>
+             </div>
+
+             <button id = 'restart-button' onclick = 'restart(); toggleMenuState()'>Restart</button>
+             
+        </div>
+        
+     </div>
+
+     <div id = 'control-panel'>
+         
+         <div id = 'bombs-counter'>000</div>
+         <div id = 'smile-block' onclick = 'restart()' onmousedown = 'this.style.transform = "scale(1.1)"' onmouseup = 'this.style.transform = "scale(1)"'><img id = 'smile' src = 'https://dl.dropbox.com/s/6khvkcbhyyu5auz/smile.png' alt = '' draggable = 'false'></div>
+         <div id = 'timer-block'>000</div>
+         
+     </div>
+
+    <div id = 'game'>
+        
+        <table id = 'game-table'></table>
+
+    </div>
+
+    <script>
+    
+        // ___________________________________________________________
+        //|                                                           |
+        //|  Тут будет немного много комментарией,                    |
+        //|  потому что хочу сделать код максимально понятным для тех,| 
+        //|  кто вдруг захочет разобраться в нём (ВдРуГ............)  |
+        //|___________________________________________________________|
+        //
+    
+
+        // Получение размеров поля из полей ввода
+        var x = parseInt(id('x-size').value) || 8
+        var y = parseInt(id('y-size').value) || 8
+
+        // Получение количества бомб из поля ввода
+        var bombs = parseInt(id('bombs-count').value) || ~~((x*y)/6.4)
+        var playerBombsLeft = systemBombsLeft = bombs
+
+        // Отвечает за то, первый ли клик идёт по полю
+        var firstClick = true
+        
+        // Отвечает за то, не было ли движения после нажатия мышкой на поле (сделано для пролистования больших полей)
+        var notMove = true
+
+        // Иконки бомб и пустых полей (влияет только на логику)
+        var bombIcon  = '■'
+        var emptyIcon = '□'
+
+        // Объявление переменной прошедшего времени и интервала секундомера (для его последующей остановки)
+        var secondsLeft = 0
+        var timerInterval
+
+        // Отвечает за то, будет ли менятся смайлик при нажатиях
+        var smileCanBeChanged = true
+
+
+        // Переменные звука
+        var openBlockSound = new Audio()
+        openBlockSound.preload = 'auto'
+        openBlockSound.src = 'https://dl.dropbox.com/s/arcdzeq05v02dn9/open-block.mp3'
+
+        var noFlagsAround = new Audio()
+        noFlagsAround.preload = 'auto'
+        noFlagsAround.src = 'https://dl.dropbox.com/s/2y6sv9f1s18r34c/no-flags-around.mp3'
+
+        var winSound = new Audio()
+        winSound.preload = 'auto'
+        winSound.src = 'https://dl.dropbox.com/s/yryx8522l1hshx0/win.mp3'
+
+        var setFlagSound = new Audio()
+        setFlagSound.preload = 'auto'
+        setFlagSound.src = 'https://dl.dropbox.com/s/14jvgjk81ctob53/set-flag.mp3'
+
+        var explosion = new Audio()
+        explosion.preload = 'auto'
+        explosion.src = 'https://dl.dropbox.com/s/z58n0h04t5fx7nl/explosion.wav'
+
+
+        // Массив отклонений координат, для прохождения по всем блокам вокруг одного
+        bufferPoints = [[-1,-1],[-1,0],[-1,1], [0,-1],[0,0],[0,1], [1,-1],[1,0],[1,1]]
+        
+        
+        // Сделано для старых устройств (например для моего старого телефона), не поддерживающих методы padStart и repeat
+        if (!String.prototype.repeat) String.prototype.repeat = function(n) {return new Array(n+1).join(this)}
+        if (!String.prototype.padStart) {
+            String.prototype.padStart = function padStart(targetLength,padString) {
+                targetLength = targetLength>>0
+                padString = String((typeof padString !== 'undefined' ? padString : ' '))
+                if (this.length > targetLength) {
+                    return String(this)
+                }
+                else {
+                    targetLength = targetLength-this.length
+                    if (targetLength > padString.length) {
+                        padString += padString.repeat(targetLength/padString.length)
+                    }
+                    return padString.slice(0,targetLength) + String(this)
+                }
+            }
+        }
+        
+        
+        
+        // Функция для обращения к элементам по id
+        function id(id){return document.getElementById(id)}
+        
+        
+
+        // Генератор рандомных целых чисел
+        function randInt(min, max){return ~~((Math.random() * (max - min)) + min)}
+
+        // Индекс ячейки в X координату на поле
+        function indexToX(index){return parseInt(index - x*~~(index/x))}
+
+        // Индекс ячейки в Y координату на поле
+        function indexToY(index){return parseInt(~~(index/x))}
+
+        // Обновление количество оставшихся бомб
+        function updateRemainingMines(){
+            if (playerBombsLeft >= 0) id('bombs-counter').innerHTML = String(playerBombsLeft).padStart(3, '0')
+            else id('bombs-counter').innerHTML = playerBombsLeft
+        }
+
+        // Подстровка верхнего блока под ширину поля при изменении размера окна
+        window.onresize = function(){
+            id('control-panel').style.width = id('game').getBoundingClientRect().width + 'px'
+        }
+
+        // Прокрутка поля мышкой
+        game = id('game')
+        game.onmousedown = function(){
+            if (smileCanBeChanged) id('smile').src = 'https://dl.dropbox.com/s/f4ltnn6t7jt8m66/smile-click.png'
+
+            // Сохранение координат первого нажатия, для расчёта расстояния, которое прошла мышка
+            startClickX = event.pageX
+            startClickY = event.pageY
+
+            game.onmousemove = function(event){
+                
+                // Двигать, если было нажатие левой кнопкой
+                if (event.which == 1){
+                   
+                    // Если растояние максимального отклонения от стартовой точки больше 15 пикселей, то начнётся прокрутка и при отпускании кнопки блок, на котором была мышка, не откроется
+                    if (Math.sqrt(Math.pow(startClickX - event.pageX, 2) + Math.pow(startClickY - event.pageY, 2)) > 15) {
+                        
+                        // Если не было движения, то оно появляется и запоминается стартовые значения прокрутки поля
+                        if (notMove){
+                            
+                            notMove = false
+                            
+                            // Сохранение стартовых значений прокрутки поля
+                            startScrollX = this.scrollLeft + event.pageX
+                            startScrollY = this.scrollTop  + event.pageY
+                        }
+                        
+                        this.scrollLeft = startScrollX - event.pageX
+                        this.scrollTop  = startScrollY - event.pageY
+                    }
+                }
+                return false
+            }
+        }
+        window.onmouseup = function(){
+            if (smileCanBeChanged) id('smile').src = 'https://dl.dropbox.com/s/6khvkcbhyyu5auz/smile.png'
+            
+            // Движения уже нет, следующее нажатие откроет блок (если не будет движения)
+            setTimeout(function(){notMove = true})
+            game.onmousemove = function(){return}
+        }
+        
+        // Открытие блока при нажатии
+        id('game-table').onclick = function(event){
+            
+            // Если не было движения и нажатие было левой кнопкой, то открыть блок
+            if (notMove && event.which == 1) clickBlock(event)
+        }
+        
+        // Изменение смайлика при нажатии на экран телефона
+        window.ontouchstart = function(){
+            if (smileCanBeChanged) id('smile').src = 'smile-click.png'}
+        window.ontouchend = function(){
+            if (smileCanBeChanged) id('smile').src = 'smile.png'}
+
+
+        // Установка флажка на ПКМ и при долгом удержании пальца
+        window.oncontextmenu = function(){return false}
+        id('game-table').oncontextmenu = setFlag
+
+        // Открытие нажатого блока
+        function clickBlock(event) {
+
+            // Поиск индекса кликнутой ячейки
+            for (index = 0; index < td.length; index++){
+                if (td[index] == event.target) {
+
+                    // Если первое нажатие
+                    if (firstClick){
+                        
+                        // Уже не первый клик :(
+                        firstClick = false
+                        
+                        // Запись координат первого нажатия
+                        clickX = indexToX(index)
+                        clickY = indexToY(index)
+                        
+                        // Заполнить поле
+                        fillField()
+
+                        // И обновить кол-во оставшихся бомб в счётчике
+                        updateRemainingMines()
+
+                        // Запуск таймера
+                        timerInterval = setInterval(function(){
+                            if (secondsLeft < 999) secondsLeft++
+                            id('timer-block').innerHTML = String(secondsLeft).padStart(3, '0')
+                        }, 1000)
+                    }
+
+                    // Ничего не делать, если на блоке стоит флажок
+                    if (td[index].classList.contains('block-flag')) return
+
+                    // Если тыкнутый блок не бомба и закрытый блок, то проиграть звук открытия
+                    if (field[indexToY(index)][indexToX(index)] != bombIcon && td[index].classList.contains('closed-block')){
+                        openBlockSound.pause()
+                        openBlockSound.currentTime = 0
+                        openBlockSound.play()
+                    }
+
+                    // Если тыкнутый блок уже открыт и содержит цифру, то открыть все блоки вокруг, если количество флажков равно значению блока
+                    // (или не открыть)
+                    if (!td[index].classList.contains('closed-block') && parseInt(field[indexToY(index)][indexToX(index)])){
+
+                        // Подсчёт флажков и закрытых блоков вокруг
+                        flagsCount = 0
+                        closedBlockCount = 0
+                        for (point of bufferPoints){
+                            try    {
+                                
+                                // Индекс элемента, находящегося в радиусе тыкнутого блока
+                                pointIndex = ((indexToY(index)+point[0])*x) + (indexToX(index)+point[1])
+                                    
+                                // Если блок флаг и в пределах поля, то количество флагов +1
+                                if (td[pointIndex].classList.contains('block-flag') &&
+                                    indexToX(index) + point[1] >= 0 && indexToX(index) + point[1] < x &&
+                                    indexToY(index) + point[0] >= 0 && indexToY(index) + point[0] < y) flagsCount++
+
+                                // Если блjr закрытый и в пределах поля, то количество закрытых блоков +1
+                                else if (td[pointIndex].classList.contains('closed-block') &&
+                                    indexToX(index) + point[1] >= 0 && indexToX(index) + point[1] < x &&
+                                    indexToY(index) + point[0] >= 0 && indexToY(index) + point[0] < y) closedBlockCount++
+                            }
+                            catch (e) {continue}
+                        }
+
+                        // Открыть блоки вокруг, если количество флажков равно значению и присутствуют закрытые блоки в его радиусе
+                        if (flagsCount == parseInt(field[indexToY(index)][indexToX(index)]) && closedBlockCount){
+
+                            // Открытие бомб в радиусе, если они есть
+                            for (point of bufferPoints){
+                                try {
+                                    // Индекс бомбы, находящейся в радиусе тыкнутого блока
+                                    pointIndex = ((indexToY(index)+point[0])*x) + (indexToX(index)+point[1])
+
+                                    // Открыть бомбу если она лежит в пределах поля
+                                    if (!td[pointIndex].classList.contains('block-flag')&&
+                                        field[indexToY(pointIndex)][indexToX(pointIndex)] == bombIcon &&
+                                        (indexToX(index) + point[1] >= 0 && indexToX(index) + point[1] < x &&
+                                         indexToY(index) + point[0] >= 0 && indexToY(index) + point[0] < y)){
+                                            return openBlock(pointIndex, indexToX(index)+point[1], indexToY(index)+point[0])
+                                    }
+                                }
+                                catch(e) {continue}
+                            }
+
+                            // Звук открытия блока
+                            openBlockSound.pause()
+                            openBlockSound.currentTime = 0
+                            openBlockSound.play()
+
+                            // Открытие безопасных блоков в радиусе тыкнутого блока
+                            for (point of bufferPoints){
+                                try {
+                                    // Индекс элемента, находящегося в радиусе тыкнутого блока
+                                    pointIndex = ((indexToY(index)+point[0])*x) + (indexToX(index)+point[1])
+
+                                    // Открыть блок если он лежит в пределах поля
+                                    if (td[pointIndex].classList.contains('closed-block') &&
+                                            (indexToX(index) + point[1] >= 0 && indexToX(index) + point[1] < x &&
+                                             indexToY(index) + point[0] >= 0 && indexToY(index) + point[0] < y)) 
+                                        openBlock(pointIndex, indexToX(index)+point[1], indexToY(index)+point[0])
+                                }
+                                catch(e) {continue}
+                            }
+                            return
+                        }
+                        else {
+                            
+                            // Звук отстутсвия необходимого количества флагов вокруг
+                            noFlagsAround.pause()
+                            noFlagsAround.currentTime = 0
+                            noFlagsAround.play()
+                        }
+                    }
+
+                    // Открытие блока
+                    openBlock(index, indexToX(index), indexToY(index))
+                    return
+                }
+            }
+        }
+
+        // Заполнение таблицы ячейками
+        function createTable(){
+            field = []
+
+            // Заполнение системного поля пустыми значеними
+            for (i = 0; i < y; i++){
+                field.push([])
+                for (j = 0; j < x; j++){
+                    field[i].push(emptyIcon)
+                }
+            }
+
+            // Заполнение HTML таблицы пустыми ячейками
+            table = id('game-table')
+            table.innerHTML = ''
+            tableRow = '<tr>'+('<td class = "closed-block"></td>'.repeat(x))+'</tr>'
+            table.innerHTML = tableRow.repeat(y)
+
+            // Получение всех ячеек таблицы
+            td = document.getElementsByTagName('td')
+
+            // Подстройка ширины верхнего блока под ширину поля
+            id('control-panel').style.width = id('game').getBoundingClientRect().width + 'px'
+        }
+        createTable()
+
+        // Заполнение таблицы бомбами и цифрами
+        function fillField(){
+
+            // Рандомная генерация бомб
+            for (i = 0; i < bombs; i++){
+
+                // Генерация двух значений
+                randX = randInt(0, x)
+                randY = randInt(0, y)
+
+                // Проверка на генерацию в уже занятом блоке
+                if (field[randY][randX] == bombIcon){
+                    i--
+                    continue
+                }
+
+                // Проверка на близость с первым нажатием
+                (function(){
+                    for (point of bufferPoints){
+                        if (randY+point[0] == clickY && randX+point[1] == clickX) {
+                            i--
+                            return
+                        }
+                    }
+                    field[randY][randX] = bombIcon
+                })()
+            }
+
+            // Создание цифр рядом с бомбами
+            for (i = 0; i < field.length; i++){
+                for (j = 0; j < field[i].length; j++){
+                    if (field[i][j] == emptyIcon){
+                        bombsCount = 0
+                        for (point of bufferPoints){
+                            try {
+                                if (field[i+point[0]][j+point[1]] == bombIcon) bombsCount++
+                             } catch(e) {
+                                continue
+                            }
+                        }
+                        (bombsCount) ? field[i][j] = bombsCount : field[i][j] = emptyIcon
+                    }
+                }
+            }
+        }
+
+        // Установка флажка по кликнотуму блоку
+        function setFlag(event) { 
+            for (i = 0; i < td.length; i++){
+                if (td[i] == event.target) {
+
+                    // Если блок закрыт и на нём не стоит флажок 
+                    if (td[i].classList.contains('closed-block')){
+
+                        // Звук установки флага
+                        setFlagSound.pause()
+                        setFlagSound.currentTime = 0
+                        setFlagSound.play()
+
+                        // Если мина поставлена правильно, уменьшить системное количество бомб
+                        if (field[indexToY(i)][indexToX(i)] == bombIcon) systemBombsLeft--
+
+                        // Уменьшение пользовательского счётчика бомб
+                        playerBombsLeft--
+                        updateRemainingMines()
+
+                        // Изменение класса блока
+                        td[i].classList.remove('closed-block')
+                        td[i].classList.add('block-flag')
+                    }
+
+                    // Если блок закрыт и на нём уже стоит флажок
+                    else if (td[i].classList.contains('block-flag')){
+
+                        // Звук установки флага
+                        setFlagSound.pause()
+                        setFlagSound.currentTime = 0
+                        setFlagSound.play()
+
+                        // Если мина поставлена правильно, увеличить системное количество бомб
+                        if (field[indexToY(i)][indexToX(i)] == bombIcon) systemBombsLeft++
+                            
+                        // Увеличение пользовательского счётчика бомб
+                        playerBombsLeft++
+                        updateRemainingMines()
+
+                        // Изменение класса блока
+                        td[i].classList.remove('block-flag')
+                        td[i].classList.add('closed-block')
+                    }
+                    return
+                }
+            }
+        }
+
+        // Открытие блока по индексу и координатам
+        function openBlock(index,blockX,blockY){
+
+            // Удаление класса пустого блока и получение значения этого блока
+            td[index].classList.remove('closed-block')
+            value = field[blockY][blockX]
+
+            // Если кликнутый блок пустая клетка
+            if (value == emptyIcon) {
+                
+                // Установка на блок класса пустого блока
+                td[index].classList.add('empty-block')
+
+                // Открытие всех ближайший не минированных клеток
+                for (point of bufferPoints) {
+                    try {
+                        if (field[blockY+point[0]][blockX+point[1]] && field[blockY+point[0]][blockX+point[1]] != bombIcon && td[((blockY+point[0])*x) + (blockX+point[1])].classList.contains('closed-block')){
+                            openBlock( ((blockY+point[0])*x) + (blockX+point[1]) , blockX+point[1] , blockY+point[0] )
+                        }
+                    } catch(e) {continue}
+                }
+            }
+            
+            // Если кликнутый блок бомба
+            else if (value == bombIcon) {
+
+
+                // ----------------- Проигрыш ----------------- //
+
+
+                // Звук проигрыша
+                explosion.pause()
+                explosion.currentTime = 0
+                explosion.play()
+
+                // Изменение смайлика на грусный
+                id('smile').src = 'https://dl.dropbox.com/s/tmcvjpljplkrvjb/smile-sad.png'
+                smileCanBeChanged = false
+
+                // Остановка таймера
+                clearInterval(timerInterval)
+
+                // Установка на блок класса бомбы
+                td[index].classList.add('block-bomb')
+
+                // Отключение всех событий управления
+                id('game-table').oncontextmenu = function(){return}
+                id('game-table').onclick       = function(){return}
+
+                // Показ всех закрытых бомб
+                for (i = 0; i < y; i++){
+                    for (j = 0; j < x; j++){
+                        if (field[i][j] == bombIcon){
+                            if (td[(i*x) + j].classList.contains('closed-block')){
+                                td[(i*x) + j].classList.remove('closed-block')
+                                td[(i*x) + j].classList.add('closed-block-bomb')
+                            }
+                        }
+                    }
+                }
+                
+                // Зачёркивание неверно установленных флагов
+                for (i = 0; i < x*y; i++){
+                    if (td[i].classList.contains('block-flag') && field[indexToY(i)][indexToX(i)] != bombIcon){
+                        td[i].classList.remove('block-flag')
+                        td[i].classList.add('block-flag-cross')
+                    }
+                }
+                return
+            }
+
+            // Открытие блоков с цифрами
+            else if (parseInt(value)) td[index].classList.add('block-'+value)
+
+            // Проверка на выигрыш (сумма количества закрытых блоков и блоков с флажками должны равняться установленному количеству бомб)
+            if (bombs == document.getElementsByClassName('closed-block').length + document.getElementsByClassName('block-flag').length) {
+
+
+                // ----------------- Выигрыш ----------------- //
+
+
+                // Звук Выигрыша
+                winSound.pause()
+                winSound.currentTime = 0
+                winSound.play()
+
+                // Изменение смайлика на крутого
+                id('smile').src = 'https://dl.dropbox.com/s/r8hyt3das6cxtwt/smile-cool.png'
+                smileCanBeChanged = false
+
+                // Остановка таймера
+                clearInterval(timerInterval)
+                
+                // Обнуление счётчика бомб 
+                playerBombsLeft = systemBombsLeft = 0
+                updateRemainingMines()
+
+                // Отключение всех событий управления
+                id('game-table').oncontextmenu = function(){return}
+                id('game-table').onclick       = function(){return}
+
+                // Установка флагов на оставшихся закрытых блоках
+                for (i = 0; i < td.length; i++){
+                    if (field[indexToY(i)][indexToX(i)] == bombIcon){
+                        td[i].classList.remove('closed-block')
+                        td[i].classList.add('block-flag')
+                    }
+                }
+            }
+        }
+
+        // Перезапуск
+        function restart(){
+            
+            // Получение размеров поля из полей ввода
+            x = parseInt(id('x-size').value) || 8
+            y = parseInt(id('y-size').value) || 8
+    
+            // Получение количества бомб из поля ввода
+            bombs = parseInt(id('bombs-count').value) || ~~((x*y)/6.4)
+            playerBombsLeft = systemBombsLeft = bombs
+
+            // Изменение смайлика на обычный
+            id('smile').src = 'https://dl.dropbox.com/s/6khvkcbhyyu5auz/smile.png'
+            smileCanBeChanged = true
+
+            // Указание на то, что следующий клик будет первым
+            firstClick = true
+
+            // Остановка таймера, если он был
+            if (timerInterval) clearInterval(timerInterval)
+            secondsLeft = 0
+
+            // Обнуление всех счётчиков
+            id('bombs-counter').innerHTML = '000'
+            id('timer-block').innerHTML   = '000'
+
+            // Создание нового поля
+            createTable()
+
+            // Включение событий управления
+            id('game-table').oncontextmenu = setFlag
+            id('game-table').onclick = function(event){
+                if (notMove && event.which == 1) clickBlock(event)
+            }
+        }
+
+    </script>
+
+</body>
+
+</html> 

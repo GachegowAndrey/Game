@@ -1,0 +1,537 @@
+
+@font-face {
+    font-family: 'DigitalCyrillic';
+
+    src: url('https://dl.dropbox.com/s/7u19qere9hii8sw/DigitalCyrillic.otf');
+}
+
+* {
+    font-family: 'Arial';
+
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+
+    -webkit-user-select: none;
+    text-align: center;
+    text-decoration: none;
+
+    outline: none !important;
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+*:after {
+    font-weight: bold
+}
+
+body {
+    position: fixed;
+
+    display: flex;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    width: 100vw;
+    height: 100vh;
+
+    background: #E2E2E2;
+
+    flex-wrap: nowrap;
+    align-content: stretch;
+}
+
+/* Стрелочка открытия меню */
+#open-menu {
+    font-size: 38px;
+
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: calc(50vw - 2.5vh);
+
+    width: 5vh;
+    height: 5vh;
+
+    transition: .6s transform, .5s top;
+    transform: rotate(90deg);
+
+    color: #888;
+}
+
+/* Меню */
+#menu {
+    position: fixed;
+    z-index: 30;
+    top: -50vh;
+    left: 0;
+
+    display: flex;
+    justify-content: space-around;
+
+    width: 100vw;
+    height: 55vh;
+    padding: 5vh 0 5vh 0;
+
+    transition: .5s top;
+
+    border-bottom: 2px solid #787878;
+    background: #E2E2E2;
+
+    flex-direcion: column}
+    
+    /* Кнопки меню */
+    #menu button {
+        font-size: 24px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+        height: 5vh;
+
+        border: none;
+        border-radius: 15px;
+        background: #E2E2E2;
+        box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9}
+        #menu button:active {
+            box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9
+    }
+    
+    /* Поля ввода в меню */
+    #menu input {
+        font-size: 20px;
+
+        width: 20vw;
+        height: 30px;
+        padding-left: 10px;
+
+        text-align: left;
+
+        border-radius: 15px;
+        background: #E2E2E2;
+        box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9
+        border: none;
+    }
+    
+    /* Блок выбора стандартных полей */
+    #presets-selector {
+        display: flex;
+        justify-content: space-around;
+        flex-direction: column;
+
+        height: 30vh;
+        padding: 0 2vh 0 2vh;
+
+        border: 3px inset #FCFCFC;
+        border-radius: 15px}
+        #presets-selector p {
+            font-size: 24px;
+        }
+
+    /* Блок ручной настройки поля */
+    #manual-selector {
+        display: flex;
+        justify-content: space-around;
+        flex-direction: column;
+
+        height: 45vh;
+        padding: 0 2vh 0 2vh;
+
+        border: 3px inset #FCFCFC;
+        border-radius: 15px}
+        #manual-selector p {
+            font-size: 20px;
+        }
+    
+/* Верхняя панель над полем */
+#control-panel {
+    display: flex;
+    justify-content: space-between;
+
+    width: 0;
+    height: 64px;
+    margin-top: 5vh;
+    padding: 12px 12px 0 12px;
+
+    border-radius: 15px 15px 0 0;
+    background: #CCC}
+    
+    /* Счётчик оставшихся бомб */
+    #bombs-counter {
+        font-family: DigitalCyrillic;
+        font-size: 42px;
+
+        display: flex;
+
+        width: 82px;
+        height: 52px;
+        padding-left: 2px;
+
+        text-align: center;
+
+        border: 3px inset #E2E2E2;
+        background: #DDD;
+    }
+    
+    /* Блок со смайликом */
+    #smile-block {
+        position: relative;
+
+        width: 48px;
+        height: 48px;
+        margin-top: 4px;
+
+        background: #E2E2E2;
+        box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9}
+        #smile {
+            width: 32px;
+            height: 32px;
+            margin-top: 9px;
+        }
+        
+    /* Блок с таймером */
+    #timer-block {
+        font-family: DigitalCyrillic;
+        font-size: 42px;
+
+        display: flex;
+
+        width: 82px;
+        height: 52px;
+        padding-left: 2px;
+
+        text-align: center;
+
+        border: 3px inset #E2E2E2;
+        background: #DDD;
+}
+
+/* Блок с игровыми элементами */
+#game {
+    position: relative;
+
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+
+    max-width: 100vw;
+    max-height: calc(95vh - 64px);
+
+    border: 12px solid #CCC;
+    border-radius: 0 0 15px 15px;
+    background: #CCC}
+
+    /* Игровое поле */
+    #game-table {
+        margin: auto}
+
+        /* Ячейки игрового поля */
+        td {
+            width: 46px;
+            min-width: 46px;
+            max-width: 46px;
+            height: 46px;
+            min-height: 46px;
+            max-height: 46px;
+
+            transition: .2s;
+}
+
+
+
+/* Блоки */
+
+
+
+.closed-block {
+    background: #E2E2E2;
+    box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9}
+    .closed-block:hover {
+        background: #EFEFEF;
+}
+
+.empty-block {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9;
+}
+
+.block-bomb {
+    position: relative;
+
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-bomb:after {
+        font-size: 28px;
+
+        position: absolute;
+
+        content: url(http://icons.iconarchive.com/icons/google/noto-emoji-smileys/32/12158-bomb-icon.png);
+        transform: translate(-16px, -18px);
+}
+
+.closed-block-bomb {
+    position: relative;
+
+    background: #E2E2E2;
+    box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9}
+    .closed-block-bomb:after {
+        font-size: 28px;
+
+        position: absolute;
+
+        content: url(http://icons.iconarchive.com/icons/google/noto-emoji-smileys/32/12158-bomb-icon.png);
+        transform: translate(-16px, -16px);
+}
+
+.block-flag {
+    position: relative;
+
+    background: #E2E2E2;
+    box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9}
+    .block-flag:after {
+        font-size: 32px;
+
+        position: absolute;
+
+        content: url(https://smileysplanet.ru/smileys/google/triangular-flag-2358.png);
+        transform: translate(-16px, -16px);
+}
+
+.block-flag-cross {
+    position: relative;
+
+    background: #E2E2E2;
+    box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9}
+    .block-flag-cross:before {
+        font-size: 64px;
+
+        position: absolute;
+        z-index: 10;
+
+        content: '×';
+        transform: translate(-18px, -36px);
+
+        color: #B00;
+    }
+    .block-flag-cross:after {
+        font-size: 32px;
+
+        position: absolute;
+
+        content: url(https://smileysplanet.ru/smileys/google/triangular-flag-2358.png);
+        transform: translate(-16px, -16px);
+}
+
+
+.block-1 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-1:after {
+        font-size: 32px;
+
+        content: '1';
+
+        color: #3498DB;
+}
+
+.block-2 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-2:after {
+        font-size: 32px;
+
+        content: '2';
+
+        color: #2ECC71;
+}
+
+.block-3 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-3:after {
+        font-size: 32px;
+
+        content: '3';
+
+        color: #E74C3C;
+}
+
+.block-4 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-4:after {
+        font-size: 32px;
+
+        content: '4';
+
+        color: #9B59B6;
+}
+
+.block-5 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-5:after {
+        font-size: 32px;
+
+        content: '5';
+
+        color: #F1C40F;
+}
+
+.block-6 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-6:after {
+        font-size: 32px;
+
+        content: '6';
+
+        color: #8005B0;
+}
+
+.block-7 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-7:after {
+        font-size: 32px;
+
+        content: '7';
+
+        color: #F2970F;
+}
+
+.block-8 {
+    background: #D5D5D5;
+    box-shadow: inset 0 1px 0 0 #C9C9C9, inset 1px 0 0 0 #C9C9C9, inset 0 -1px 0 0 #C9C9C9, inset -1px 0 0 0 #C9C9C9}
+    .block-8:after {
+        font-size: 32px;
+
+        content: '8';
+        animation: rainbow 20s infinite alternate;
+
+        background: linear-gradient(to bottom, #E74C3C, #E74C3C, #FFA500, #FFA500, #FF0, #FF0, #0F0, #0F0, #0FF, #0FF, #3498DB, #3498DB,  #9B59B6, #9B59B6);
+        -webkit-background-clip: text;
+        background-size: 1000% 1000%;
+
+        -webkit-text-fill-color: transparent;
+}
+
+/* Анимация для блока с 8, потому что он редкий :) */
+@keyframes rainbow {
+    0% { background-position: 50% 0}
+    100% { background-position: 50% 100%}
+}
+    
+/* Стили для телефонов (или мелких экранов)*/
+@media (max-width: 500px) {
+    #open-menu {
+        font-size: 18px;
+    }
+    
+    #menu {
+        top: -50vh;
+        left: 0;
+
+        width: 100vw;
+        height: 55vh}
+        #menu * { 
+            font-size: 11px !important;
+        }
+        #menu input {
+            height: 3vh;
+        }
+
+        #presets-selector button {
+            height: 5vh;
+        }
+        #manual-selector button {
+            height: 4vh;
+    }
+
+
+    #control-panel {
+    height: 48px}
+        #bombs-counter {
+            font-size: 30px;
+
+            width: 60px;
+            height: 42px;
+
+            background: #DDD;
+        }
+        #smile-block {
+            position: relative;
+
+            width: 32px;
+            height: 32px;
+            margin-top: 2px;
+
+            background: #E2E2E2;
+            box-shadow: inset 0 2px 0 0 #FCFCFC, inset 2px 0 0 0 #FCFCFC, inset 0 -2px 0 0 #C9C9C9, inset -2px 0 0 0 #C9C9C9}
+            #smile {
+                width: 24px;
+                height: 24px;
+                margin-top: 4px;
+        }
+        #timer-block {
+            font-size: 30px;
+
+            width: 60px;
+            height: 42px;
+
+            background: #DDD;
+    }
+
+    
+    #game {
+        max-width: 100vw;
+        max-height: calc(95vh - 48px)}
+        td {
+            width: 24px;
+            min-width: 24px;
+            max-width: 24px;
+            height: 24px;
+            min-height: 24px;
+            max-height: 24px;
+        }
+        
+    .block-1:after {font-size: 20px}
+    .block-2:after {font-size: 20px}
+    .block-3:after {font-size: 20px}
+    .block-4:after {font-size: 20px}
+    .block-5:after {font-size: 20px}
+    .block-6:after {font-size: 20px}
+    .block-7:after {font-size: 20px}
+    .block-8:after {font-size: 20px}
+    
+    .block-bomb:after {
+        transform: translate(-16px, -18px) scale(.5);
+    }
+
+    .closed-block-bomb:after {
+        transform: translate(-16px, -18px) scale(.5);
+    }
+    
+    .block-flag:after {
+        transform: translate(-16px, -18px) scale(.5); 
+    }
+
+    .block-flag-cross:before {
+        font-size: 32px;
+
+        transform: translate(-10px, -18px)
+    }
+    .block-flag-cross:after {
+        transform: translate(-16px, -18px) scale(.5);
+    }
+}
+
+
+::-webkit-scrollbar { 
+    display: none; 
+}
