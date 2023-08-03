@@ -1,0 +1,8 @@
+.status {
+    display: inline;
+}
+
+#battleStatus {
+    width: 70%;
+    margin: 10px;
+}
