@@ -1,0 +1,201 @@
+﻿<DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<title>Allods</title>
+	<style type="text/css">
+		h2{
+			text-align: center;
+		}
+		.section{
+			display: flex;
+		}
+		.article{
+			background-color: blue;
+			color: white;
+			width: 100%;
+			padding: 10px;
+			margin: 10px;
+		}
+		.popupMain{
+			position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    opacity: 0; /*// Скрываем фон и сам попап*/
+    pointer-events: none; /*// Запрещаем ему быть целью событий*/
+    transition: 0.5s all;
+		}
+		.popupMain.active{
+
+	/* При добавлении класса 'active'*/
+    opacity: 1; /* Показываем фон и попап*/
+    pointer-events: all; /* Возвращаем события*/
+    transition: 0.5s all;
+		}
+		.popup{
+			 position: absolute;
+			 text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);/* // Центрируем и масштабируем в 0 само окно
+    */background: #fff;
+    width: 80%;
+    padding: 25px;
+    transition: 0.5s all;
+		}
+		.popup.active { /*// При добавлении класса 'active'*/
+    transform: translate(-50%, -50%) scale(1);/* Так же центрируем и плавно увеличиваем
+    */transition: 0.5s all;
+}
+.close-popup {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+#name{
+	opacity: 1;
+	}
+	.menu{
+		/*width: 300px;
+        display: flex;
+        overflow-x: auto;
+		scroll-snap-type: x mandatory;*/ 
+  width: 300px;
+  display: flex;
+  overflow-x: auto;
+  border: 2px dotted orange;
+  scroll-snap-type: x mandatory;  
+      margin-left: auto;
+    margin-right: auto;
+	}
+	.Attributes{
+   scroll-snap-align: start;
+   flex-shrink: 0;
+   width: 300px;
+  height: 90%;
+  border: 1px solid blue;
+  text-align: center;
+	}
+	</style>
+
+
+</head>
+<body>
+	<div class="popupMain" id="statsHero">
+		<div class="popup">
+			<div class="close-popup">X</div>
+	<div class="menu">
+			<div class="Attributes">
+			<h2>Attributes</h2>
+		
+		<p id = 'att' class = 'status'></p><br><br>
+        <p id = 'def' class = 'status'></p><br><br>
+        <p id = 'spd' class = 'status'></p><br><br>
+        <p id = 'dex' class = 'status'></p><br><br>
+        <p id = 'int' class = 'status'></p><br><br>			
+			</div>	
+		<div class="Attributes" id="inventory" >
+			<h2>Inventory</h2>
+			<div class="section">
+			<div class="article">
+				Weapon
+			</div>
+			<div class="article">
+				Armor
+			</div>
+			<div class="article">
+				Other
+			</div>			
+			</div>
+		</div>			
+	</div>
+
+		</div>
+
+		
+	</div>
+	<!--<div class="popupMain" id="name">
+		<div class="popup">
+			<div class="close-popup">Close</div>
+        
+		</div>
+		
+	</div>-->
+
+			<p id = 'name'>Name: 
+            <input id = "nameInput">
+
+            <input id = "bot ok" type = "button" value = "Ok" onclick="document.getElementById('stats').style.display='block' 
+                document.getElementById('actions').style.display='block'
+            "></p>
+	        
+        <div id="stats">
+        	<button class="open-popup">Open Stats</button>
+        	<p id = 'level'></p>
+            <p id = 'points'></p>
+        	<p id = 'xp'></p>
+            <p id = 'hp'></p>
+            <p id = 'mp'></p>
+            <p id = 'gold' class = 'status'></p><br>
+        
+        
+        </div>
+        
+        
+        <br>
+        
+        <div id = 'actions'>
+        	
+        </div>
+        <br>
+        <div id = 'battleStatus'>
+            <p id = info1 ></p>
+            <p id = info2 ></p>
+        </div>
+        <div id = 'enemyInfo'>
+            <p id = 'eName'></p>
+            
+            <p id = 'eHp'></p>
+            <p id = 'eMp'></p>
+            
+            
+            <p id = 'eAtt'></p>
+            <p id = 'eDef'></p>
+            <p id = 'eSpd'></p>
+        </div>
+        <div id = 'battleButtons'>
+        </div>
+        <script type="text/javascript">
+let popupBg = document.querySelector('.popupMain'); // Фон попап окна
+let popup = document.querySelector('.popup'); // Само окно
+let openPopupButtons = document.querySelectorAll('.open-popup'); // Кнопки для показа окна
+let closePopupButton = document.querySelector('.close-popup'); // Кнопка для скрытия окна
+
+openPopupButtons.forEach((button) => { // Перебираем все кнопки
+    button.addEventListener('click', (e) => { // Для каждой вешаем обработчик событий на клик
+        e.preventDefault(); // Предотвращаем дефолтное поведение браузера
+        popupBg.classList.add('active'); // Добавляем класс 'active' для фона
+        popup.classList.add('active'); // И для самого окна
+    })
+});
+
+closePopupButton.addEventListener('click',(e) => { // Вешаем обработчик на крестик
+    popupBg.classList.remove('active'); // Убираем активный класс с фона
+    popup.classList.remove('active'); // И с окна
+});
+
+
+document.addEventListener('click', (e) => { // Вешаем обработчик на весь документ
+    if(e.target === popupBg) { // Если цель клика - фот, то:
+        popupBg.classList.remove('active'); // Убираем активный класс с фона
+        popup.classList.remove('active'); // И с окна
+    }
+});
+        </script>
+<script type="text/javascript" src="script.js"></script>
+</body>
+</html>

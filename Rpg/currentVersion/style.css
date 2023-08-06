@@ -1,0 +1,64 @@
+#actions{
+			display: none;
+		}
+		.status {
+    display: inline;
+}
+#stats{
+	display: none;
+}
+#gold{
+	border: 1px solid gold;
+}
+/*#enemyInfo{
+	display: none;
+}-->*/
+
+#hp, #eHp {
+	
+	width:200px;
+	background-color: red;
+	color: white;
+	z-index:2;
+	
+}
+#mp, #emp{
+	width:200px;
+	background-color: blue;
+	color: white;
+	
+}
+
+#battleStatus {
+    width: 70%;
+    margin: 10px;
+}
+#mana{
+	  color: gold;
+      background-color: blue;
+}
+#train{
+  color: gold;
+  background-color: brown;
+}
+#heal{
+    color:blue;
+	background-color: red;
+	border: 1px solid pink;
+}
+
+#startBattle{
+	color: black;
+	background-color: red;
+}
+input[type="button"]{
+ border: 1px solid black;
+	border-radius: 10px;
+}
+button:hover{
+   cursor: pointer;
+}
+input[type="button"]:hover {
+	cursor: pointer;
+
+}
