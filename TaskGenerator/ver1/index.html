@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+		.task{
+			text-align: center;
+		}
+		.num{
+			display: inline;
+			color: red;
+		}
+		#help, #answer, #answer2{
+			color: #fff;
+			display: inline;
+		}
+		#help:hover, #answer:hover , #answer2:hover {
+    /*background: #786b59; /* Цвет фона под ссылкой */ 
+    color: #0ff; 
+    cursor: pointer;
+    display: inline;
+   }
+	</style>
+	<title>Physic Generator</title>
+</head>
+<body>
+	<div class="task">
+		<h2>Task 1</h2>
+	<p>У вас есть:<div id="var1" class="num"></div> и <div class="num" id="var2"></div>.</p>
+	<p>Вам нужно найти:<div class="num" id="var3"></div>.</p>
+	<p>Ответ:<div class="num" id="answer"></div>.</p>
+
+	<div>Формула:<div id="help">S=v*t</div>.</div>	
+</div>
+
+<div class="task">
+	<h2>Task 2</h2>
+	<p>Какова энергия упругой деформации сжатой на <div class="num" id="var4"></div>  см пружины, если её жёсткость равна <div class="num" id="var5">5000</div>  Н/м?</p>
+		<p>Ответ:<div class="num" id="answer2"></div>Дж.</p>
+
+	<div>Формула:<div id="help">E=(k*x<sup>2</sup>)&#8260;2</div>.</div>
+		
+	
+</div>
+</body>
+<script type="text/javascript">
+	var time1=Math.ceil(Math.random()*20);
+	var speed1=Math.ceil(Math.random()*20);
+	var deformation1=(Math.ceil(Math.random()*5)*10);
+	var energy=Math.floor(10 + Math.random() * (50 + 1 - 10));
+	var deformation=document.getElementById("var4").innerHTML=
+	deformation1;
+	var rigidity=document.getElementById("var5").innerHTML=
+	(Math.ceil(Math.random()*15)*1000);
+	/*(energy*2)/(deformation*deformation*0.01)*/;
+	/*document.getElementById("var5").innerHTML=
+	Math.floor(2000 + Math.random() * (8000 + 1 - 2000));*/
+	var answer =document.getElementById("answer2").innerHTML =
+	 
+	(rigidity*Math.pow(deformation,2)/2)*0.0001;
+	var distance1 = time1*speed1;
+	var time2="t= ? час";
+	var speed2="v= ? км/час";
+	var distance2="S= ? км";
+	var time3="t= "+time1+" час";
+	var speed3="v= "+speed1+" км/час";
+	var distance3="S= "+distance1+" км";
+	var chance = Math.ceil(Math.random()*3);
+	switch(chance){
+		  case 1:
+          
+          
+          	var var1 = document.getElementById("var1").innerHTML =time3;
+	        var var2 = document.getElementById("var2").innerHTML =distance3;
+	        var var3 = document.getElementById("var3").innerHTML =speed2;
+		    var answer = document.getElementById("answer").innerHTML =speed3;
+          break;
+
+		  case 2:
+		  
+         	var var1 = document.getElementById("var1").innerHTML =speed3;
+	var var2 = document.getElementById("var2").innerHTML =time3;
+	var var3 = document.getElementById("var3").innerHTML =distance2;
+		var answer = document.getElementById("answer").innerHTML =distance3;
+		
+          break;
+
+		  case 3:
+          
+                   	var var1 = document.getElementById("var1").innerHTML =speed3;
+	var var2 = document.getElementById("var2").innerHTML =distance3;
+	var var3 = document.getElementById("var3").innerHTML =time2;
+		var answer = document.getElementById("answer").innerHTML =time3;
+          break;
+
+	}
+	/*alert(chance);
+	 alert( '1 2' );*/
+	/*var var1 = document.getElementById("var1").innerHTML =time2;
+	var var2 = document.getElementById("var2").innerHTML =speed2;
+	var var3 = document.getElementById("var3").innerHTML =distance2;
+	var answer = document.getElementById("answer").innerHTML =distance+"км";*/
+
+
+</script>
+</html>
